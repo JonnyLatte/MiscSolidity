@@ -63,6 +63,7 @@ contract sellable is owned {
     
     function initPrivateSale(uint _price, address _recipient) 
         throwIfLocked
+        lockIfSelling
     {
         price = _price;
         lockedToRecipient = true;
@@ -71,6 +72,7 @@ contract sellable is owned {
     
     function initPublicSale(uint _price)
         throwIfLocked
+        lockIfSelling
     {
         price = _price;
         lockedToRecipient = false;
