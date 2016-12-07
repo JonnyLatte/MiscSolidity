@@ -49,6 +49,8 @@ contract sellable is ownedTokenBox {
         if(msg.value < price || (lockedToRecipient && msg.sender != recipient)) throw;
         if(msg.value > price) if(!msg.sender.send(msg.value - price)) throw;
         
+        if(!owner.send(price)) throw; 
+        
         owner = msg.sender;
         selling = false;
     }
