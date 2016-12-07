@@ -3,7 +3,39 @@ pragma solidity ^0.4.4;
 import "erc20.sol";
 import "owned.sol";
 
-contract ownedTokenBox is owned {
+
+contract sellable is owned {
+ 
+    bool public selling = false;
+    uint public price;
+    bool public lockedToRecipient;
+    address public recipient;
+    bool public locked = false;
+    uint public lockTime;
+    
+    uint public lockInterval = 60*60*3; //3 hours
+    
+    modifier lockIfSelling() {
+        
+        if(selling && !locked) {
+            locked = true;
+            lockTime = now + lockInterval;
+        }   
+        
+        _;
+    }
+    
+    modifier throwIfLocked() {
+        if(locked) throw;
+        _;
+    }
+    
+    function unlock() {
+        if(now > lockTime) {
+            locked = false;
+            selling = false;
+        }
+    }
     
     // allows owner to deposit ETH
     // deposit tokens by sending them directly to contract
@@ -13,39 +45,39 @@ contract ownedTokenBox is owned {
 
     // allow owner to remove arbitrary tokens
     // included just in case contract receives wrong token
-    function withdrawToken(address _token, uint256 _value) onlyOwner returns (bool ok)
+    function withdrawToken(address _token, uint256 _value) 
+        onlyOwner 
+        lockIfSelling returns (bool ok)
     {
         return ERC20(_token).transfer(owner,_value);
     }
 
     // allow owner to remove ETH
-    function withdraw(uint256 _value) onlyOwner returns (bool ok)
+    function withdraw(uint256 _value) 
+        onlyOwner
+        lockIfSelling
+        returns (bool ok)
     {
         return owner.send(_value);
     }   
     
-}
-
-contract sellable is ownedTokenBox {
- 
-    bool public selling = false;
-    uint public price;
-    bool public lockedToRecipient;
-    address public recipient;
-    
-    function initPrivateSale(uint _price, address _recipient) {
+    function initPrivateSale(uint _price, address _recipient) 
+        throwIfLocked
+    {
         price = _price;
         lockedToRecipient = true;
         recipient = _recipient;
     }
     
-    function initPublicSale(uint _price) {
+    function initPublicSale(uint _price)
+        throwIfLocked
+    {
         price = _price;
         lockedToRecipient = false;
         recipient = 0;
     }
     
-    function () {
+    function () throwIfLocked {
         if(msg.value < price || (lockedToRecipient && msg.sender != recipient)) throw;
         if(msg.value > price) if(!msg.sender.send(msg.value - price)) throw;
         
