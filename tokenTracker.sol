@@ -42,13 +42,13 @@ contract tokenTracker is owned {
         return extra[_addr][id];
     }
     
-    function getAddress(address _addr) constant returns(uint _decimals, string _symbol, string _name, string _tag) {
+    function getAddress(address _addr) constant returns(uint _decimals, string _symbol, string _name) {
         _decimals = decimals[_addr];
         _symbol = symbol[_addr];
         _name = name[_addr];
     }
     
-    function getIndex(uint _index) constant returns(address _addr, uint _decimals, string _symbol, string _name, string _tag) {
+    function getIndex(uint _index) constant returns(address _addr, uint _decimals, string _symbol, string _name) {
         _addr = addr[_index];
         _decimals = decimals[_addr];
         _symbol = symbol[_addr];
