@@ -114,6 +114,7 @@ contract publicTokenTracker is owned {
     }
     
     function getIndex(uint _index) constant returns(address _addr, uint _decimals, string _symbol, string _name, uint _units, bool _locked) {
+		_addr = addr[_index];
         _decimals = decimals[_addr];
         _symbol = symbol[_addr];
         _name = name[_addr];
