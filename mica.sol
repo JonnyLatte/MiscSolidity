@@ -4,9 +4,13 @@ pragma solidity ^0.4.4;
 // 
 //  Mica, ERC20 token OTC exchange.
 //
-//  JonnyLatte (c) 2017 The MIT licence.
+//  JonnyLatte (c) 2017 The MIT License.
 //
 //-----------------------------------------------------------------------------------------------------
+
+
+// ERC20 defines the standard token interface 
+// any token implementing transfer and transferFrom will be usable with this exchange
 
 // https://github.com/ethereum/EIPs/issues/20
 contract ERC20 {
@@ -24,7 +28,7 @@ contract MicaTypes {
     
     struct OFFER {
         address owner;  // owner of the offer
-        ERC20 currency; // "currency" referese to the token used to buy with
+        ERC20 currency; // "currency" refers to the token used to buy with
         ERC20 asset;    // "asset" refers to the token that is on offer
         uint units;     // asset is sold in multiples of "units"
         uint price;     // amount of currency needed to buy a lot of units
@@ -49,11 +53,11 @@ contract Mica is MicaTypes
         address seller,
         address buyer);
 
-    // offers stores all offer in one big int array
+    // offers stores all offer data in one big int array
     // the index to each offer never changes
     // last_offer_index will be the index of the next offer created 
     // (incremented by one each time)
-    // offer data is retreived with getOfferInfo()
+    // offer data is retrieved with getOfferInfo()
     
     uint public last_offer_index;
     mapping(uint => OFFER) offers; 
