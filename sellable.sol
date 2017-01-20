@@ -1,7 +1,7 @@
 pragma solidity ^0.4.4;
 
-import "erc20.sol";
-import "owned.sol";
+import "github.com/JonnyLatte/MiscSolidity/erc20.sol";
+import "github.com/JonnyLatte/MiscSolidity/owned.sol";
 
 
 contract sellable is owned {
