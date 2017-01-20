@@ -1,7 +1,7 @@
 pragma solidity ^0.4.4;
 
-import "owned.sol";
-import "baseToken.sol";
+import "github.com/JonnyLatte/MiscSolidity/owned.sol";
+import "github.com/JonnyLatte/MiscSolidity/baseToken.sol";
 
 //testing token enables anyone to issue it or zero a balance
 
