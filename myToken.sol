@@ -1,6 +1,6 @@
 pragma solidity ^0.4.4;
 
-import "baseToken.sol";
+import "github.com/JonnyLatte/MiscSolidity/baseToken.sol";
 
 contract MyToken is baseToken {
     
