@@ -1,6 +1,6 @@
 pragma solidity ^0.4.4;
 
-import "owned.sol";
+import "github.com/JonnyLatte/MiscSolidity/owned.sol";
 
 contract tokenTracker is owned {
     
