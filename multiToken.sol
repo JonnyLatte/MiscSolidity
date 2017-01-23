@@ -1,7 +1,9 @@
+
 pragma solidity ^0.4.4;
 
 import "github.com/JonnyLatte/MiscSolidity/erc20.sol"; 
 import "github.com/JonnyLatte/MiscSolidity/SafeMath.sol";
+import "github.com/JonnyLatte/MiscSolidity/baseToken.sol";
 
 contract MULTITOKEN {
     event Transfer(address indexed token, address indexed from, address indexed to, uint value);
@@ -172,4 +174,34 @@ contract fundManager is MultiTokenBase {
 
 contract fundManagerEX is fundManager, multiOwnedToken {
     
+}
+
+contract multiTokenToERC20 is baseToken, SafeMath {
+    
+    MULTITOKEN public multi;
+    address    public token;
+    
+    function multiTokenToERC20( MULTITOKEN _multi, address  _token) {
+        multi = _multi;
+        token = _token;
+    }
+    
+    function deposit(uint value) returns (bool ok) {
+        if(!multi.transferFrom(token,msg.sender,this,value)) throw;
+        
+        _balances[msg.sender] = safeAdd(_balances[msg.sender],value);
+        _supply = safeAdd(_supply,value);
+        
+        return true;
+    }
+    
+    function widthraw(uint value) returns (bool ok) {
+        
+        _balances[msg.sender] = safeSub(_balances[msg.sender],value);
+        _supply = safeSub(_supply,value);
+        
+        if(!multi.transfer(token,msg.sender,value)) throw;
+        
+        return true;
+    }
 }
