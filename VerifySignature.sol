@@ -1,5 +1,7 @@
 pragma solidity ^0.4.2;
 
+// deployed on testnet: https://testnet.etherscan.io/address/0xc35650A5AEee97e66112E2aaC83F80853D221ae8#code
+
 contract VerifySig {
     
     function check(bytes32 data, uint8 v, bytes32 r, bytes32 s) constant returns(address) 
