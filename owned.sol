@@ -22,7 +22,7 @@ contract ownedWithAproval
     address public approvedOwner;
     address public owner;
 
-    function owned() {
+    function ownedWithAproval() {
         owner = msg.sender;
     }
 
