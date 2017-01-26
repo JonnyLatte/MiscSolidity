@@ -61,6 +61,11 @@ contract MultiTokenBase is MULTITOKEN, SafeMath {
         return _approvals[token][owner][spender];
     }
     
+    function appTransfer(address _token, address owner,  address _to, uint256 _value) internal returns (bool ok) {
+        _balances[_token][owner] = safeSub( _balances[_token][owner], _value);
+        _balances[_token][_to]   = safeAdd( _balances[_token][_to]  , _value);
+        Transfer(_token,msg.sender,_to,_value);
+    }
 }
 
 contract multiGenTokenBase is MultiTokenBase 
@@ -163,12 +168,6 @@ contract fundManager is MultiTokenBase {
             funds[_token] = fund_balance;
         }
         Withdraw(_token,msg.sender,_to , _value);
-    }
-    
-    function appTransfer(address _token, address owner,  address _to, uint256 _value) internal returns (bool ok) {
-        _balances[_token][owner] = safeSub( _balances[_token][owner], _value);
-        _balances[_token][_to]   = safeAdd( _balances[_token][_to]  , _value);
-        Transfer(_token,msg.sender,_to,_value);
     } 
 }
 
