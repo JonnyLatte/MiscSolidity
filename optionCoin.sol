@@ -3,7 +3,7 @@ pragma solidity ^0.4.4;
 import "github.com/JonnyLatte/MiscSolidity/appToken.sol"; 
 import "github.com/JonnyLatte/MiscSolidity/owned.sol"; 
 
-contract optionCoin is appToken, ownedWithAproval {
+contract optionToken is appToken, ownedWithAproval {
     
     address public currency;   // Token used to buy
     address public asset;      // Token on offer
@@ -23,7 +23,7 @@ contract optionCoin is appToken, ownedWithAproval {
         else throw;
     }
     
-    function optionCoin(
+    function optionToken(
         address _currency, 
         address _asset, 
         uint256 _price, 
