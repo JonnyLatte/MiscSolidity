@@ -5,8 +5,8 @@ import "github.com/JonnyLatte/MiscSolidity/owned.sol";
 
 contract optionToken is appToken, ownedWithAproval {
     
-    address public currency;   // Token used to buy
-    address public asset;      // Token on offer
+    ERC20 public currency;   // Token used to buy
+    ERC20 public asset;      // Token on offer
     uint256 public price;      // Amount of currency needed to buy a lot (smallest units)
     uint256 public units;      // Amount of asset being sold in a lot (smallest units)
     uint256 public expireTime;  // trading ends at this timestamp
@@ -24,8 +24,8 @@ contract optionToken is appToken, ownedWithAproval {
     }
     
     function optionToken(
-        address _currency, 
-        address _asset, 
+        ERC20 _currency, 
+        ERC20 _asset, 
         uint256 _price, 
         uint256 _units, 
         uint256 _duration) 
@@ -43,7 +43,7 @@ contract optionToken is appToken, ownedWithAproval {
         returns (bool ok)
     {
         var value = safeMul(units,unit_lots);
-        if(!ERC20(asset).transferFrom(msg.sender, address(this),value)) throw; 
+        if(!asset.transferFrom(msg.sender, address(this),value)) throw; 
         issueTokens(msg.sender,value);
         return true;
     }
@@ -75,7 +75,21 @@ contract optionToken is appToken, ownedWithAproval {
         onlyOwner
         returns (bool ok)
     {
-        return ERC20(currency).transfer(msg.sender,_value);
+        return currency.transfer(msg.sender,_value);
+    }
+    
+    function claimFundsAndDestroyContract()   
+        onlyOwner
+        onlyAfterExpire
+        returns (bool ok)
+    {
+        uint256 asset_balance = asset.balanceOf(this);
+        uint256 currency_balance = currency.balanceOf(this);
+        
+        if(!asset.transfer(owner,asset_balance)) throw;
+        if(!currency.transfer(owner,currency_balance)) throw;
+        
+        suicide(owner);
     }
     
     // option holder buys asset
@@ -87,8 +101,8 @@ contract optionToken is appToken, ownedWithAproval {
         var payment = safeMul(price,unit_lots);
         
         burnTokens(msg.sender,value);
-        if(!ERC20(currency).transferFrom(msg.sender, address(this),payment)) throw; 
-        if(!ERC20(asset).transfer(msg.sender,value)) throw; 
+        if(!currency.transferFrom(msg.sender, address(this),payment)) throw; 
+        if(!asset.transfer(msg.sender,value)) throw; 
         return true;
     } 
 }
