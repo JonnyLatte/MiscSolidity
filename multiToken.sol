@@ -175,7 +175,7 @@ contract fundManagerEX is fundManager, multiOwnedToken {
     
 }
 
-contract multiTokenToERC20 is baseToken, SafeMath {
+contract multiTokenToERC20 is baseToken {
     
     MULTITOKEN public multi;
     address    public token;
