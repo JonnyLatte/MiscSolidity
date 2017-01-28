@@ -19,17 +19,17 @@ contract tipBot is owned, verySig {
         return sha3(username,service);
     }
 
-    function getUserRegistrationHash(address user, bytes32 userHash) constant returns (bytes32) 
+    function getUserRegistrationHash(address userAddress, bytes32 userHash) constant returns (bytes32) 
     {
-        return sha3(this,user, userHash);
+        return sha3(this,userAddress, userHash);
     }
     
-    function registerAccount(address user, bytes32 userHash, bytes tipBotSig) 
+    function registerAccount(address userAddress, bytes32 userHash, bytes tipBotSig) 
     {
-        var hash = getUserRegistrationHash(user, userHash);
+        var hash = getUserRegistrationHash(userAddress, userHash);
         if(owner != checkSig(hash,tipBotSig) ) throw;
         
-        user_accounts[userHash] = user;
+        user_accounts[userHash] = userAddress;
     }
     
     function getTipHash(address tipper,  bytes32 receiver, address token, uint256 value, uint256 expiry) constant returns (bytes32) 
