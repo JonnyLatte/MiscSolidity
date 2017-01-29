@@ -7,6 +7,8 @@ import "github.com/JonnyLatte/MiscSolidity/appToken.sol";
 // a node is a sha3 hash of 2 hashes that can be added to the validHash mapping using addNode()
 // a claim is a sha3 hash of an address and uint256 balance
 // calling processClaim() issues tokens to 
+//
+// Jonnylatte, MIT licence
 
 contract rootToken is appToken {
     
