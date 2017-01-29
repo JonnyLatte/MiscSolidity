@@ -10,15 +10,15 @@ import "github.com/JonnyLatte/MiscSolidity/appToken.sol";
 //
 // Jonnylatte, MIT licence
 
-contract rootToken is appToken {
-    
+contract rootTokenBase 
+{
     bytes32 public rootHash;
     mapping(bytes32 => bool) public validHash;
     mapping(bytes32 => bool) public claimedHash;
     
-    function rootToken(bytes32 _rootHash) {
+    function initRoot(bytes32 _rootHash) internal {
         rootHash = _rootHash;
-        validHash[_rootHash] = true;
+        validHash[_rootHash] = true;  
     }
     
     function hashNode(bytes32 left, bytes32 right) constant returns (bytes32) 
@@ -49,7 +49,15 @@ contract rootToken is appToken {
         validHash[right] = true;
         return true;
     }
+}
 
+contract rootToken is rootTokenBase, appToken 
+{
+    function rootToken(bytes32 _rootHash) 
+    {
+        initRoot(_rootHash);
+    }
+    
     function processClaim(address target, uint256 value)  returns (bool ok)
     {
         var hash = hashClaim(target, value);
