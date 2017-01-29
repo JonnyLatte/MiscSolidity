@@ -1,10 +1,10 @@
 pragma solidity ^0.4.4;
 
-import "github.com/JonnyLatte/MiscSolidity/baseToken.sol";
+import "github.com/JonnyLatte/MiscSolidity/appToken.sol";
 
 // An ETH wrapper but it adds 6 decimal places
 
-contract szaboToken is baseToken {
+contract szaboToken is appToken {
     
      uint256 constant public conversion = 1000000; 
     
@@ -13,11 +13,8 @@ contract szaboToken is baseToken {
         
         depositAmount = depositAmount * conversion;
         
-        if (depositAmount < conversion) throw;
-        if (_balances[msg.sender] + depositAmount < depositAmount) throw;
+        issueTokens(msg.sender,depositAmount);
         
-        _balances[msg.sender] += depositAmount;
-        _supply += depositAmount;
         return true;
     }
     
@@ -25,12 +22,8 @@ contract szaboToken is baseToken {
         
         uint256 szaboValue = value * conversion;
         
-        if(szaboValue < value) throw;
-        
-        if (_balances[msg.sender] < szaboValue) throw;
-        _balances[msg.sender] -= szaboValue;
-        _supply -= szaboValue;
-        
+        burnTokens(msg.sender,szaboValue);
+
         if(!msg.sender.send(value)) throw;
         
         return true; 
