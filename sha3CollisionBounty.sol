@@ -5,12 +5,17 @@ import "github.com/JonnyLatte/MiscSolidity/erc20.sol";
 contract sha3CollisionBounty {
     
     address public owner;
+    bytes32 public A;
+    bytes32 public B;
     
     function claim(bytes32 a, bytes32 b) {
         
         if(owner != 0        ) throw; // can only be claimed once
         if(a == b            ) throw; // must be 2 different sets of data
         if(sha3(a) != sha3(b)) throw; // must hash to the same value
+        
+        A = a;
+        B = b;
         
         owner = msg.sender;
     }
