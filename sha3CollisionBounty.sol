@@ -4,7 +4,7 @@ import "github.com/JonnyLatte/MiscSolidity/erc20.sol";
 
 contract sha3CollisionBounty {
     
-    address owner;
+    address public owner;
     
     function claim(bytes32 a, bytes32 b) {
         
