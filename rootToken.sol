@@ -26,19 +26,9 @@ contract rootTokenBase
         return sha3(left,right);
     }  
     
-    function hashClaim(address target, uint256 value) constant returns (bytes32) 
-    {
-        return sha3(target,value);
-    }    
-    
     function validNode(bytes32 left, bytes32 right) constant returns (bool ok)
     {
         return validHash[hashNode(left,right)];
-    }
-    
-    function validClaim(address target, uint256 value) constant returns (bool ok)
-    {
-        return validHash[hashClaim(target, value)];
     }
     
     function addNode(bytes32 left, bytes32 right) returns (bool ok)
@@ -56,6 +46,16 @@ contract rootToken is rootTokenBase, appToken
     function rootToken(bytes32 _rootHash) 
     {
         initRoot(_rootHash);
+    }
+
+    function hashClaim(address target, uint256 value) constant returns (bytes32) 
+    {
+        return sha3(target,value);
+    }   
+    
+    function validClaim(address target, uint256 value) constant returns (bool ok)
+    {
+        return validHash[hashClaim(target, value)];
     }
     
     function processClaim(address target, uint256 value)  returns (bool ok)
