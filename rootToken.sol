@@ -10,7 +10,7 @@ import "github.com/JonnyLatte/MiscSolidity/appToken.sol";
 //
 // Jonnylatte, MIT licence
 
-contract rootTokenBase 
+contract rootBase 
 {
     bytes32 public rootHash;
     mapping(bytes32 => bool) public validHash;
@@ -41,7 +41,7 @@ contract rootTokenBase
     }
 }
 
-contract rootToken is rootTokenBase, appToken 
+contract rootToken is rootBase, appToken 
 {
     function rootToken(bytes32 _rootHash) 
     {
