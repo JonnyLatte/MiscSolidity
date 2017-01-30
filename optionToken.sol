@@ -3,6 +3,8 @@ pragma solidity ^0.4.4;
 import "github.com/JonnyLatte/MiscSolidity/appToken.sol"; 
 import "github.com/JonnyLatte/MiscSolidity/owned.sol"; 
 
+// Jonnylatte 2017, MIT licence
+
 contract optionToken is appToken, ownedWithAproval {
     
     ERC20 public currency;   // Token used to buy
