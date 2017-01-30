@@ -44,7 +44,7 @@ contract optionToken is appToken, ownedWithAproval {
     {
         var value = safeMul(units,unit_lots);
         if(!asset.transferFrom(msg.sender, address(this),value)) throw; 
-        issueTokens(msg.sender,value);
+        issueTokens(msg.sender,unit_lots);
         return true;
     }
 
@@ -56,7 +56,7 @@ contract optionToken is appToken, ownedWithAproval {
         returns (bool ok)
     {
         var value = safeMul(units,unit_lots);
-        burnTokens(msg.sender,value);
+        burnTokens(msg.sender,unit_lots);
         if(!ERC20(asset).transfer(msg.sender,value)) throw; 
         return true;
     }
@@ -100,9 +100,9 @@ contract optionToken is appToken, ownedWithAproval {
         var value = safeMul(units,unit_lots);
         var payment = safeMul(price,unit_lots);
         
-        burnTokens(msg.sender,value);
+        burnTokens(msg.sender,unit_lots);
         if(!currency.transferFrom(msg.sender, address(this),payment)) throw; 
-        if(!asset.transfer(msg.sender,value)) throw; 
+        if(!asset.transfer(msg.sender,unit_lots)) throw; 
         return true;
     } 
 }
