@@ -16,6 +16,7 @@ contract optionFactory
     }
     
     uint public last_option_id;
+    
     mapping(uint => OPTION_INFO) option_info;
 
     //--------------------------------------------------------------------------------
@@ -27,10 +28,10 @@ contract optionFactory
     
     event optionCreatedEvent(
         uint id,
-        address owner,
-        ERC20 sell_token,
+        address indexed owner,
+        ERC20 indexed sell_token,
         uint  sell_units,
-        ERC20 buy_token,
+        ERC20 indexed buy_token,
         uint  buy_units,
         uint expiry,
         ERC20 token);
@@ -133,7 +134,8 @@ contract optionFactory
     {
         var option = option_info[id];
         
-        if(option.owner != msg.sender) throw;   
+        if(option.owner != msg.sender) throw;  
+        if(option.expiry < now) throw;
         
         var supply = option.token.totalSupply();
         if(!option.sell_token.transfer(msg.sender,supply)) throw;
