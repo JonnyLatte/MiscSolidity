@@ -11,6 +11,8 @@ contract miniOTC {
     Token   public maker_sell_token;
     uint256 public maker_sell_units;
     
+    event onTrade(uint256 unitLots);
+    
     function  miniOTC(Token _maker_buy_token, uint256 _maker_buy_units, Token _maker_sell_token, uint256 _maker_sell_units) 
     {
        maker_buy_token   = _maker_buy_token;
@@ -23,6 +25,7 @@ contract miniOTC {
     {
         if(!maker_buy_token.transferFrom(msg.sender,maker,unitLots * maker_buy_units)) throw;
         if(!maker_sell_token.transferFrom(maker,msg.sender,unitLots * maker_sell_units)) throw;
+        onTrade(unitLots);
     }
 }
 
