@@ -125,7 +125,7 @@ contract optionFactory
         
         if(!option.token.burn(unitLots,msg.sender)) throw;
         if(!option.buy_token.transferFrom (msg.sender,option.owner,unitLots*option.buy_units )) throw;
-        if(!option.sell_token.transferFrom(this      ,msg.sender  ,unitLots*option.sell_units)) throw;
+        if(!option.sell_token.transfer(msg.sender  ,unitLots*option.sell_units)) throw;
         
         exerciseEvent(id,unitLots);
     }
