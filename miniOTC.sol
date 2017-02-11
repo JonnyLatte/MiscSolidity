@@ -21,8 +21,8 @@ contract miniOTC {
     
     function trade(address maker, uint256 unitLots) 
     {
-        if(!maker_buy_token.transferFrom(msg.sender,maker,unitLots * maker_sell_units)) throw;
-        if(!maker_sell_token.transferFrom(maker,msg.sender,unitLots * maker_buy_units)) throw;
+        if(!maker_buy_token.transferFrom(msg.sender,maker,unitLots * maker_buy_units)) throw;
+        if(!maker_sell_token.transferFrom(maker,msg.sender,unitLots * maker_sell_units)) throw;
     }
 }
 
