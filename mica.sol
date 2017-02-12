@@ -269,7 +269,7 @@ contract Mica is MicaTypes, SafeMath
 // MicaHelper: pull specific data from Mica contract
 // This could be included in Mica itself but is seperate to keep the Mica contract simple
 
-contract MicaHelper is MicaTypes
+contract MicaHelper is MicaTypes, SafeMath
 {
     function countOffersFrom(Mica mica, uint offer_index) constant returns (uint) {
         if(offer_index == 0) return 0;
@@ -336,7 +336,7 @@ contract MicaHelper is MicaTypes
             
             (,,,,current_units,current_price,current_balance,) = mica.getOfferInfo(offer_index);
             
-            if(current_price * best_units < best_units * current_price && current_balance  >= minBalance) {
+            if(current_price * best_units < safeMul(best_units , current_price) && current_balance  >= minBalance) {
                 best = offer_index;
                 (best_units,best_price,best_balance) = (current_units,current_price,current_balance);
             }
