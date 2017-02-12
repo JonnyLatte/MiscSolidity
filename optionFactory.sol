@@ -2,7 +2,7 @@ pragma solidity ^0.4.4;
 
 import "github.com/JonnyLatte/MiscSolidity/ownedToken.sol";
 
-contract optionFactory 
+contract optionFactory is SafeMath
 {
     struct OPTION_INFO 
     {
@@ -99,7 +99,7 @@ contract optionFactory
         
         if(option.owner != msg.sender) throw;
         
-        if(!option.sell_token.transferFrom(msg.sender,this,unitLots*option.sell_units)) throw;
+        if(!option.sell_token.transferFrom(msg.sender,this,safeMul(unitLots,option.sell_units))) throw;
         option.token.issue(unitLots,msg.sender);
         
         mintEvent(id,unitLots);
@@ -112,7 +112,7 @@ contract optionFactory
         if(option.owner != msg.sender) throw;
         
         if(!option.token.burn(unitLots,msg.sender)) throw;
-        if(!option.sell_token.transfer(msg.sender,unitLots*option.sell_units)) throw;
+        if(!option.sell_token.transfer(msg.sender,safeMul(unitLots,option.sell_units))) throw;
         
         burnEvent(id,unitLots);
     }
@@ -124,8 +124,8 @@ contract optionFactory
         if(option.expiry > now) throw;
         
         if(!option.token.burn(unitLots,msg.sender)) throw;
-        if(!option.buy_token.transferFrom (msg.sender,option.owner,unitLots*option.buy_units )) throw;
-        if(!option.sell_token.transfer(msg.sender  ,unitLots*option.sell_units)) throw;
+        if(!option.buy_token.transferFrom (msg.sender,option.owner,safeMul(unitLots,option.buy_units))) throw;
+        if(!option.sell_token.transfer(msg.sender  ,safeMul(unitLots,option.sell_units))) throw;
         
         exerciseEvent(id,unitLots);
     }
