@@ -1,5 +1,7 @@
 pragma solidity ^0.4.4;
 
+import "github.com/JonnyLatte/MiscSolidity/SafeMath.sol";
+
 //-----------------------------------------------------------------------------------------------------
 // 
 //  Mica, ERC20 token OTC exchange.
@@ -39,7 +41,7 @@ contract MicaTypes {
     bool constant PREV = false;      
 }
 
-contract Mica is MicaTypes
+contract Mica is MicaTypes, SafeMath
 {
     // track UpdateEvent for any change in the status of an offer
     event  UpdateEvent(uint offer_index, address indexed currency, address indexed asset);
@@ -154,13 +156,13 @@ contract Mica is MicaTypes
         
         if(unit_lots_to_buy == 0) return false;
         
-        uint currency_value = unit_lots_to_buy * offer.price;
-        uint asset_value    = unit_lots_to_buy * offer.units;
+        uint currency_value = safeMul(unit_lots_to_buy , offer.price);
+        uint asset_value    = safeMul(unit_lots_to_buy , offer.units);
         
         if(currency_value < unit_lots_to_buy) throw; //overflow test
         if(asset_value < unit_lots_to_buy) throw; //overflow test
         
-        offers[offer_index].balance -= asset_value;
+        offers[offer_index].balance = safeSub(offers[offer_index].balance,asset_value);
        
         if(!offer.currency.transferFrom(msg.sender,offer.owner,currency_value)) throw; 
         if(!offer.asset.transfer(msg.sender,asset_value)) throw;
