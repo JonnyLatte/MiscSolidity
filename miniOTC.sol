@@ -21,12 +21,20 @@ contract miniOTC {
        maker_sell_units  = _maker_sell_units; 
     }
     
+    function assert(bool assertion) internal {
+       if (!assertion) throw;  
+    }
+
+    function safeMul(uint a, uint b) internal returns (uint) {
+        uint c = a * b;
+        assert(a == 0 || c / a == b);
+        return c;
+    }
+    
     function trade(address maker, uint256 unitLots) 
     {
-        if(unitLots * maker_buy_units < unitLots) throw;  //overflow checking
-        if(unitLots * maker_sell_units < unitLots) throw; //overflow checking
-        if(!maker_buy_token.transferFrom(msg.sender,maker,unitLots * maker_buy_units)) throw;
-        if(!maker_sell_token.transferFrom(maker,msg.sender,unitLots * maker_sell_units)) throw;
+        if(!maker_buy_token.transferFrom(msg.sender,maker,safeMul(unitLots, maker_buy_units))) throw;
+        if(!maker_sell_token.transferFrom(maker,msg.sender,safeMul(unitLots, maker_sell_units))) throw;
         onTrade(unitLots);
     }
 }
@@ -45,4 +53,5 @@ contract miniOTCFactory {
             _maker_sell_units);       
     }
 }
+
 
