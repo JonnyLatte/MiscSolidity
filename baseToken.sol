@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.8;
 
 import "github.com/JonnyLatte/MiscSolidity/erc20.sol"; 
 import "github.com/JonnyLatte/MiscSolidity/SafeMath.sol";
