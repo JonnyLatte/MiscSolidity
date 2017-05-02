@@ -19,7 +19,7 @@ contract baseToken is ERC20, SafeMath {
     
     function transfer( address to, uint value) returns (bool ok) 
     {
-        _balances[msg.sender] = safeSub(_balances[msg.sender],value); // will throw if inssufficient funds
+        _balances[msg.sender] = safeSub(_balances[msg.sender],value); // will throw if insufficient funds
         _balances[to]         = safeAdd(_balances[to], value);        // will throw if overflow
         
         Transfer( msg.sender, to, value );
@@ -28,8 +28,8 @@ contract baseToken is ERC20, SafeMath {
     
     function transferFrom( address from, address to, uint value) returns (bool ok) 
     {
-        _approvals[from][msg.sender] = safeSub(_approvals[from][msg.sender], value); // will throw if inssuficient approval
-        _balances[from]              = safeSub(_balances[from], value);              // will throw if inssufficient funds
+        _approvals[from][msg.sender] = safeSub(_approvals[from][msg.sender], value); // will throw if insufficient approval
+        _balances[from]              = safeSub(_balances[from], value);              // will throw if insufficient funds
         _balances[to]                = safeAdd(_balances[to], value);                // will throw if overflow
         
         Transfer( from, to, value );
