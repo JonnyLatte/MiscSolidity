@@ -1,97 +1,70 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.8;
 
-import "github.com/JonnyLatte/MiscSolidity/erc20.sol";
-import "github.com/JonnyLatte/MiscSolidity/owned.sol";
+contract owned {
+    address public owner;
 
+    function owned() {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner {
+        if (msg.sender != owner) throw;
+        _;
+    }
+
+    function transferOwnership(address newOwner) onlyOwner {
+        owner = newOwner;
+    }
+}
 
 contract sellable is owned {
- 
-    bool public selling = false;
+    
+    bool public selling;
     uint public price;
-    bool public lockedToRecipient;
-    address public recipient;
-    bool public locked = false;
-    uint public lockTime;
+    uint public nonce; 
     
-    uint public lockInterval = 60*60*3; //3 hours
+    event onSale(uint price);
+    event onCancelSale();
+    event onTrade();
+    event onExecute(address _to, uint _value, bytes _data);
     
-    modifier lockIfSelling() {
-        
-        if(selling && !locked) {
-            locked = true;
-            lockTime = now + lockInterval;
-        }   
-        
-        _;
-    }
-    
-    modifier throwIfLocked() {
-        if(locked) throw;
-        _;
-    }
-    
-    function unlock() {
-        if(now > lockTime) {
-            locked = false;
-            selling = false;
-        }
-    }
-    
-    // allows owner to deposit ETH
-    // deposit tokens by sending them directly to contract
-    // buyers must not send tokens to the contract, use: sell(...)
-    function deposit() payable onlyOwner {
-    }
-
-    // allow owner to remove arbitrary tokens
-    // included just in case contract receives wrong token
-    function withdrawToken(address _token, uint256 _value) 
-        onlyOwner 
-        lockIfSelling returns (bool ok)
-    {
-        return ERC20(_token).transfer(owner,_value);
-    }
-
-    // allow owner to remove ETH
-    function withdraw(uint256 _value) 
-        onlyOwner
-        lockIfSelling
-        returns (bool ok)
-    {
-        return owner.send(_value);
-    }   
-    
-    function initPrivateSale(uint _price, address _recipient) 
-        throwIfLocked
-        lockIfSelling
-    {
-        price = _price;
-        lockedToRecipient = true;
-        recipient = _recipient;
-    }
-    
-    function initPublicSale(uint _price)
-        throwIfLocked
-        lockIfSelling
-    {
-        price = _price;
-        lockedToRecipient = false;
-        recipient = 0;
-    }
-    
-    function () throwIfLocked {
-        if(msg.value < price || (lockedToRecipient && msg.sender != recipient)) throw;
-        if(msg.value > price) if(!msg.sender.send(msg.value - price)) throw;
-        
-        address benefactor = owner; 
-         
-        owner = msg.sender;
+    function sellable() {
         selling = false;
-        
-        // must happen last so that ownership is updated before
-        //passing control externally with send()
-        
-        if(!benefactor.send(price)) throw; 
     }
-
+    
+    function initSale(uint _price) onlyOwner 
+    {
+        nonce++;
+        price = _price;
+        selling = true;
+        
+        onSale(price);
+    }
+    
+    function cancelSale() onlyOwner {
+        selling = false;
+        onCancelSale();
+    }
+    
+    function takerBuys(uint _nonce) payable 
+    {
+        if(_nonce != nonce || !selling) return; // contract no longer selling
+        if(msg.value != price) throw;
+        selling = false; // prevent sale after ownership transfer
+        address seller = owner; // store seller address so that contract state can be updated before external call
+        owner = msg.sender; // update owner
+        if(!seller.send(msg.value)) throw; // pay seller
+        onTrade();
+    }
+    
+    function execute(address _to, uint _value, bytes _data) onlyOwner returns (bool) 
+    {
+        if(selling) cancelSale(); // interacting with contract during sale period canceles sale
+        onExecute(
+            _to, 
+            _value, 
+            _data         
+            );
+        return _to.call.value(_value)(_data); // call contracts / transfer ETH 
+    }
 }
