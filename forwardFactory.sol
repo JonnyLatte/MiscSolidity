@@ -11,6 +11,10 @@ This project is the result of the following reddit thread:
 
 https://www.reddit.com/r/ethereum/comments/6c1jui/delegatecall_forwarders_how_to_save_5098_on/
 
+As well as the following:
+
+https://blog.aragon.one/advanced-solidity-code-deployment-techniques-dc032665f434
+
 An instance of forwardFactory can be found at 0x456E17D124851FBF764514A1f9aC2Ce40DE7ac6E on the kovan network
 
 forwardFactory abi: [ { "constant": false, "inputs": [ { "name": "addr", "type": "address" } ], "name": "deployForwarder", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "", "type": "address" } ], "name": "codeDeployed", "type": "event" } ]
