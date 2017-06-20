@@ -1,29 +1,6 @@
 pragma solidity ^0.4.10;
 
-/*
-
-WARNING: the forwarders created here are not safe to receive eth. If they run out of gas they will keep it rather than unrolling the transaction.
-
-proposed alternative forwarder with return check:
-
-contract forwarder {
-  function() payable {
-    assembly {
-      calldatacopy(0x0, 0x0, calldatasize)
-      jumpi(invalidJumpLabel, iszero(
-                                        delegatecall(sub(gas, 10000), 0xf00df00df00df00df00df00df00df00df00df00d, 0x0, calldatasize, 0x0, 10000)
-                                    ))    
-      return(0x0,10000)
-    }
-  }
-}
-
---------------------------------------------------------------------------------------------------------------
-
 This is factory for generating DELEGATECALL forwarders. 
-One factory which takes in the address of the target contract each call (~187,357 gas for each contract)
-and one that is initialized with a target contract (373,595 gas to create the factory 
-then only 64,914 gas for each contract)
 
 This project is the result of the following reddit thread:
 
@@ -32,8 +9,9 @@ https://www.reddit.com/r/ethereum/comments/6c1jui/delegatecall_forwarders_how_to
 As well as the following:
 
 https://blog.aragon.one/advanced-solidity-code-deployment-techniques-dc032665f434
+https://www.reddit.com/r/ethereum/comments/6ic49q/any_assembly_programmers_willing_to_write_a/
 
-An instance of forwardFactory can be found at 0x456E17D124851FBF764514A1f9aC2Ce40DE7ac6E on the kovan network
+An instance of forwardFactory can be found at 0xba9ef985D5dA61959B88577d2a392C11c8445A7f on the kovan network
 
 forwardFactory abi: [ { "constant": false, "inputs": [ { "name": "addr", "type": "address" } ], "name": "deployForwarder", "outputs": [ { "name": "", "type": "address" } ], "payable": false, "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": false, "name": "", "type": "address" } ], "name": "codeDeployed", "type": "event" } ]
 
@@ -41,7 +19,7 @@ forwardFactory abi: [ { "constant": false, "inputs": [ { "name": "addr", "type":
 
 contract forwardFactory {
     
-    bytes fwdrCode = hex"602b600c600039602b6000f3366000600037611000600036600073f00df00df00df00df00df00df00df00df00df00d5af46110006000f3";
+    bytes fwdrCode = hex"602e600c600039602e6000f3366000600037611000600036600073f00df00df00df00df00df00df00df00df00df00d5af41558576110006000f3";
     
     function deployCode(bytes _code) internal returns (address deployedAddress)  {
         assembly {
@@ -67,7 +45,7 @@ contract forwardFactory {
 
 contract fixedForwardFactory {
     
-    bytes fwdrCode = hex"602b600c600039602b6000f3366000600037611000600036600073f00df00df00df00df00df00df00df00df00df00d5af46110006000f3";
+    bytes fwdrCode = hex"602e600c600039602e6000f3366000600037611000600036600073f00df00df00df00df00df00df00df00df00df00d5af41558576110006000f3";
     
     function deployCode(bytes _code) internal returns (address deployedAddress)  {
         assembly {
