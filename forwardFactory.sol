@@ -2,6 +2,24 @@ pragma solidity ^0.4.10;
 
 /*
 
+WARNING: the forwarders created here are not safe to receive eth. If they run out of gas they will keep it rather than unrolling the transaction.
+
+proposed alternative forwarder with return check:
+
+contract forwarder {
+  function() payable {
+    assembly {
+      calldatacopy(0x0, 0x0, calldatasize)
+      jumpi(invalidJumpLabel, iszero(
+                                        delegatecall(sub(gas, 10000), 0xf00df00df00df00df00df00df00df00df00df00d, 0x0, calldatasize, 0x0, 10000)
+                                    ))    
+      return(0x0,10000)
+    }
+  }
+}
+
+--------------------------------------------------------------------------------------------------------------
+
 This is factory for generating DELEGATECALL forwarders. 
 One factory which takes in the address of the target contract each call (~187,357 gas for each contract)
 and one that is initialized with a target contract (373,595 gas to create the factory 
