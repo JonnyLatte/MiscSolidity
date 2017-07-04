@@ -1,5 +1,19 @@
 pragma solidity ^0.4.10;
 
+/*
+
+--------------------------------------------------------------------------------------
+
+A much more efficient version of the DELEGATECALL forwarder factory can be found here:
+
+https://gist.github.com/izqui/7f904443e6d19c1ab52ec7f5ad46b3a8
+
+--------------------------------------------------------------------------------------
+
+
+
+
+
 This is factory for generating DELEGATECALL forwarders. 
 
 This project is the result of the following reddit thread:
