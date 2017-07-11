@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.12;
 
 import "github.com/JonnyLatte/MiscSolidity/baseToken.sol"; 
 import "github.com/JonnyLatte/MiscSolidity/verySig.sol"; 
@@ -12,8 +12,8 @@ contract decoupleToken is baseToken , verySig {
     
     function appTransfer(address from, address to, uint value) internal 
     {
-        _balances[from]  = safeSub(_balances[from], value);              // will throw if inssufficient funds
-        _balances[to]    = safeAdd(_balances[to], value);                // will throw if overflow
+        _balances[from]  = _balances[from].safeSub(value);              // will throw if inssufficient funds
+        _balances[to]    = _balances[to].safeAdd(value);                // will throw if overflow
     }
     
     function getTranferHash(address from, address to, uint value, uint fee, uint nonce) constant returns(bytes32) {
