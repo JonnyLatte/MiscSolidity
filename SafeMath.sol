@@ -1,3 +1,5 @@
+pragma solidity ^0.4.12;
+
 library SafeMath 
 {
   function safeMul(uint a, uint b) internal returns (uint) {
