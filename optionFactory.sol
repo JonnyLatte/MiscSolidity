@@ -1,9 +1,11 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.12;
 
 import "github.com/JonnyLatte/MiscSolidity/ownedToken.sol";
 
-contract optionFactory is SafeMath
+contract optionFactory
 {
+    using SafeMath for uint;
+    
     struct OPTION_INFO 
     {
         address    owner;
@@ -99,7 +101,7 @@ contract optionFactory is SafeMath
         
         if(option.owner != msg.sender) throw;
         
-        if(!option.sell_token.transferFrom(msg.sender,this,safeMul(unitLots,option.sell_units))) throw;
+        if(!option.sell_token.transferFrom(msg.sender,this,unitLots.safeMul(option.sell_units))) throw;
         option.token.issue(unitLots,msg.sender);
         
         mintEvent(id,unitLots);
@@ -112,7 +114,7 @@ contract optionFactory is SafeMath
         if(option.owner != msg.sender) throw;
         
         if(!option.token.burn(unitLots,msg.sender)) throw;
-        if(!option.sell_token.transfer(msg.sender,safeMul(unitLots,option.sell_units))) throw;
+        if(!option.sell_token.transfer(msg.sender,unitLots.safeMul(option.sell_units))) throw;
         
         burnEvent(id,unitLots);
     }
@@ -124,8 +126,8 @@ contract optionFactory is SafeMath
         if(option.expiry > now) throw;
         
         if(!option.token.burn(unitLots,msg.sender)) throw;
-        if(!option.buy_token.transferFrom (msg.sender,option.owner,safeMul(unitLots,option.buy_units))) throw;
-        if(!option.sell_token.transfer(msg.sender  ,safeMul(unitLots,option.sell_units))) throw;
+        if(!option.buy_token.transferFrom (msg.sender,option.owner,unitLots.safeMul(option.buy_units))) throw;
+        if(!option.sell_token.transfer(msg.sender  ,unitLots.safeMul(option.sell_units))) throw;
         
         exerciseEvent(id,unitLots);
     }
