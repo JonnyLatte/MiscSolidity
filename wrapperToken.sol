@@ -1,21 +1,20 @@
-
-pragma solidity ^0.4.8;
+pragma solidity ^0.4.12;
 
 import "github.com/JonnyLatte/MiscSolidity/baseToken.sol";
 
 contract wrapperToken is baseToken {
     
     function deposit() payable returns (bool ok) {
-        _balances[msg.sender] = safeAdd(_balances[msg.sender],msg.value);
-        _supply = safeAdd(_supply,msg.value);
+        _balances[msg.sender] = _balances[msg.sender].safeAdd(msg.value);
+        _supply = _supply.safeAdd(msg.value);
         return true;
     }
     
-    function withdraw(uint256 value) returns (bool ok) {
-        _balances[msg.sender] = safeSub(_balances[msg.sender],value);
-        _supply = safeSub(_supply,value);
+    function withdraw(uint value) returns (bool ok) {
+        _balances[msg.sender] = _balances[msg.sender].safeSub(value);
+        _supply = _supply.safeSub(value);
         
-        if(!msg.sender.send(value)) throw;
+        msg.sender.transfer(value);
         
         return true; 
     }
