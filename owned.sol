@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.12;
 
 contract owned {
     address public owner;
@@ -37,6 +37,7 @@ contract ownedWithAproval
     {
         owner = newOwner;
         approvedOwner = newOwner;
+        return true;
     }
     
     function approve(address newPotentialOwner) {
