@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.12;
 
 import "github.com/JonnyLatte/MiscSolidity/SafeMath.sol";
 
@@ -41,8 +41,10 @@ contract MicaTypes {
     bool constant PREV = false;      
 }
 
-contract Mica is MicaTypes, SafeMath
+contract Mica is MicaTypes
 {
+    using SafeMath for uint;
+    
     // track UpdateEvent for any change in the status of an offer
     event  UpdateEvent(uint offer_index, address indexed currency, address indexed asset);
     
@@ -156,13 +158,13 @@ contract Mica is MicaTypes, SafeMath
         
         if(unit_lots_to_buy == 0) return false;
         
-        uint currency_value = safeMul(unit_lots_to_buy , offer.price);
-        uint asset_value    = safeMul(unit_lots_to_buy , offer.units);
+        uint currency_value = unit_lots_to_buy.safeMul(offer.price);
+        uint asset_value    = unit_lots_to_buy.safeMul(offer.units);
         
         if(currency_value < unit_lots_to_buy) throw; //overflow test
         if(asset_value < unit_lots_to_buy) throw; //overflow test
         
-        offers[offer_index].balance = safeSub(offers[offer_index].balance,asset_value);
+        offers[offer_index].balance = offers[offer_index].balance.safeSub(asset_value);
        
         if(!offer.currency.transferFrom(msg.sender,offer.owner,currency_value)) throw; 
         if(!offer.asset.transfer(msg.sender,asset_value)) throw;
@@ -269,8 +271,10 @@ contract Mica is MicaTypes, SafeMath
 // MicaHelper: pull specific data from Mica contract
 // This could be included in Mica itself but is seperate to keep the Mica contract simple
 
-contract MicaHelper is MicaTypes, SafeMath
+contract MicaHelper is MicaTypes
 {
+    using SafeMath for uint;
+    
     function countOffersFrom(Mica mica, uint offer_index) constant returns (uint) {
         if(offer_index == 0) return 0;
         return 1 + countOffersFrom(mica,mica.link(offer_index,NEXT));
@@ -315,6 +319,8 @@ contract MicaHelper is MicaTypes, SafeMath
         return mica.getOfferInfo(mica.user_offers(_user,_pos));
     }
     
+    
+    
     function bestOffer(Mica mica, address _currency, address _asset, uint minBalance) constant returns (uint best) {
         uint offer_index = mica.firstOffer(_currency,_asset);
         best = offer_index;
@@ -336,7 +342,7 @@ contract MicaHelper is MicaTypes, SafeMath
             
             (,,,,current_units,current_price,current_balance,) = mica.getOfferInfo(offer_index);
             
-            if(current_price * best_units < safeMul(best_units , current_price) && current_balance  >= minBalance) {
+            if(current_price * best_units < best_units.safeMul(current_price) && current_balance  >= minBalance) {
                 best = offer_index;
                 (best_units,best_price,best_balance) = (current_units,current_price,current_balance);
             }
@@ -347,5 +353,6 @@ contract MicaHelper is MicaTypes, SafeMath
         if(best_balance < minBalance) best = 0;
         
         return best;
-    }
+    } 
 }
+
