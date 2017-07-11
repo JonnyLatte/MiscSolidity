@@ -1,4 +1,4 @@
-pragma solidity ^0.4.10;
+pragma solidity ^0.4.12;
 
 import "github.com/JonnyLatte/MiscSolidity/appToken.sol";
 
@@ -11,7 +11,7 @@ contract szaboToken is appToken {
     function deposit() payable returns (bool ok) {
         uint256 depositAmount = msg.value;
         
-        depositAmount = safeMul(depositAmount , conversion );
+        depositAmount = depositAmount.safeMul(conversion);
         
         issueTokens(msg.sender,depositAmount);
         
@@ -20,7 +20,7 @@ contract szaboToken is appToken {
     
     function withdraw(uint256 value) returns (bool ok) {
         
-        uint256 szaboValue = safeMul(value , conversion);
+        uint256 szaboValue = value.safeMul(conversion);
         
         burnTokens(msg.sender,szaboValue);
 
