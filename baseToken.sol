@@ -1,9 +1,11 @@
-pragma solidity ^0.4.8;
+pragma solidity ^0.4.12;
 
 import "github.com/JonnyLatte/MiscSolidity/erc20.sol"; 
 import "github.com/JonnyLatte/MiscSolidity/SafeMath.sol";
 
-contract baseToken is ERC20, SafeMath {
+contract baseToken is ERC20 {
+    
+    using SafeMath for uint;
     
     mapping( address => uint ) _balances;
     mapping( address => mapping( address => uint ) ) _approvals;
@@ -19,8 +21,8 @@ contract baseToken is ERC20, SafeMath {
     
     function transfer( address to, uint value) returns (bool ok) 
     {
-        _balances[msg.sender] = safeSub(_balances[msg.sender],value); // will throw if insufficient funds
-        _balances[to]         = safeAdd(_balances[to], value);        // will throw if overflow
+        _balances[msg.sender] = _balances[msg.sender].safeSub(value); // will throw if insufficient funds
+        _balances[to]         = _balances[to].safeAdd(value);         // will throw if overflow
         
         Transfer( msg.sender, to, value );
         return true;
@@ -28,9 +30,9 @@ contract baseToken is ERC20, SafeMath {
     
     function transferFrom( address from, address to, uint value) returns (bool ok) 
     {
-        _approvals[from][msg.sender] = safeSub(_approvals[from][msg.sender], value); // will throw if insufficient approval
-        _balances[from]              = safeSub(_balances[from], value);              // will throw if insufficient funds
-        _balances[to]                = safeAdd(_balances[to], value);                // will throw if overflow
+        _approvals[from][msg.sender] = _approvals[from][msg.sender].safeSub(value); // will throw if insufficient approval
+        _balances[from]              = _balances[from].safeSub(value);              // will throw if insufficient funds
+        _balances[to]                = _balances[to].safeAdd(value);                // will throw if overflow
         
         Transfer( from, to, value );
         return true;
