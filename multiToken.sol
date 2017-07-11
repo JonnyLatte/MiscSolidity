@@ -1,5 +1,4 @@
-
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.12;
 
 import "github.com/JonnyLatte/MiscSolidity/erc20.sol"; 
 import "github.com/JonnyLatte/MiscSolidity/SafeMath.sol";
@@ -16,7 +15,9 @@ contract MULTITOKEN {
     function approve(address token, address spender, uint value) returns (bool ok);
 }
 
-contract MultiTokenBase is MULTITOKEN, SafeMath {
+contract MultiTokenBase is MULTITOKEN {
+    
+    using SafeMath for uint;
     
     mapping( address => mapping(address => uint) ) _balances;
     mapping( address => mapping(address => mapping( address => uint )) ) _approvals;
@@ -32,8 +33,8 @@ contract MultiTokenBase is MULTITOKEN, SafeMath {
     
     function transfer( address token, address to, uint value) returns (bool ok) {
         
-        _balances[token][msg.sender] = safeSub(_balances[token][msg.sender],value);
-        _balances[token][to]         = safeAdd(_balances[token][to]        ,value);
+        _balances[token][msg.sender] = _balances[token][msg.sender].safeSub(value);
+        _balances[token][to]         = _balances[token][to].safeAdd(value);
         Transfer(token, msg.sender, to, value );
         return true;
     }
@@ -44,9 +45,9 @@ contract MultiTokenBase is MULTITOKEN, SafeMath {
         if(_balances[token][to] + value < _balances[token][to]) throw;
 
         // transfer and return true
-        _approvals[token][from][msg.sender] = safeSub(_approvals[token][from][msg.sender],value);
-        _balances[token][from]              = safeSub(_balances[token][from]             ,value);
-        _balances[token][to]                = safeAdd(_balances[token][to]               ,value);
+        _approvals[token][from][msg.sender] = _approvals[token][from][msg.sender].safeSub(value);
+        _balances[token][from]              = _balances[token][from].safeSub(value);
+        _balances[token][to]                = _balances[token][to].safeAdd(value);
         Transfer(token, from, to, value );
         return true;
     }
@@ -62,9 +63,10 @@ contract MultiTokenBase is MULTITOKEN, SafeMath {
     }
     
     function appTransfer(address _token, address owner,  address _to, uint256 _value) internal returns (bool ok) {
-        _balances[_token][owner] = safeSub( _balances[_token][owner], _value);
-        _balances[_token][_to]   = safeAdd( _balances[_token][_to]  , _value);
+        _balances[_token][owner] =  _balances[_token][owner].safeSub(_value);
+        _balances[_token][_to]   =  _balances[_token][_to].safeAdd(_value);
         Transfer(_token,msg.sender,_to,_value);
+        return true;
     }
 }
 
@@ -115,8 +117,8 @@ contract multiOwnedToken is multiGenTokenBase {
         
         if(owner[token] != msg.sender) throw;
 
-        _balances[token][account] = safeAdd(_balances[token][account], value);
-        _supply[token]            = safeAdd(_supply[token],            value);
+        _balances[token][account] = _balances[token][account].safeAdd(value);
+        _supply[token]            = _supply[token].safeAdd(value);
         
         Transfer(token, address(0), account, value);
         
@@ -127,8 +129,8 @@ contract multiOwnedToken is multiGenTokenBase {
         
         if(owner[token] != msg.sender) throw;
         
-        _balances[token][account] = safeSub(_balances[token][account], value);
-        _supply[token]            = safeSub(_supply[token],            value);
+        _balances[token][account] = _balances[token][account].safeSub(value);
+        _supply[token]            = _supply[token].safeSub(value);
         
         Transfer(token, account, address(0), value);
         
@@ -147,24 +149,24 @@ contract fundManager is MultiTokenBase {
     {
         if(!ERC20(_token).transferFrom(msg.sender,this,_value)) throw;          // external call 1
         uint256 balance = ERC20(_token).balanceOf(this);                        // external call 2
-        uint256 value = safeSub(balance, funds[_token]);
-        _balances[_token][ _to] = safeAdd(_balances[_token][ _to], value);
+        uint256 value = balance.safeSub(funds[_token]);
+        _balances[_token][ _to] = _balances[_token][ _to].safeAdd(value);
         funds[_token] = balance;
         Deposit(_token,msg.sender,_to, value);
     }
 
     function withdraw(address _token, address _to, uint256 _value)  {
-        funds[_token] = safeSub(funds[_token], _value);
-        _balances[_token][msg.sender] = safeSub(_balances[_token][msg.sender], _value);
+        funds[_token] = funds[_token].safeSub(_value);
+        _balances[_token][msg.sender] = _balances[_token][msg.sender].safeSub(_value);
         if(!ERC20(_token).transfer(_to,_value)) throw;                          // external call 3
         var fund_balance = ERC20(_token).balanceOf(this);                       // external call 4
         if(funds[_token] < fund_balance) 
         {
             // if after transfer contract funds are lower than expected
             // try and remove shortfall from user account (assume it was a fee built into the token) otherwise throw
-            uint256 fee = safeSub(funds[_token], fund_balance);
+            uint256 fee = funds[_token].safeSub(fund_balance);
             if(fee > _balances[_token][msg.sender]) throw;
-            _balances[_token][msg.sender] = safeSub(_balances[_token][msg.sender], fee);
+            _balances[_token][msg.sender] = _balances[_token][msg.sender].safeSub(fee);
             funds[_token] = fund_balance;
         }
         Withdraw(_token,msg.sender,_to , _value);
@@ -188,16 +190,16 @@ contract multiTokenToERC20 is baseToken {
     function deposit(uint value) returns (bool ok) {
         if(!multi.transferFrom(token,msg.sender,this,value)) throw;
         
-        _balances[msg.sender] = safeAdd(_balances[msg.sender],value);
-        _supply = safeAdd(_supply,value);
+        _balances[msg.sender] = _balances[msg.sender].safeAdd(value);
+        _supply = _supply.safeAdd(value);
         
         return true;
     }
     
     function widthraw(uint value) returns (bool ok) {
         
-        _balances[msg.sender] = safeSub(_balances[msg.sender],value);
-        _supply = safeSub(_supply,value);
+        _balances[msg.sender] = _balances[msg.sender].safeSub(value);
+        _supply =_supply.safeSub(value);
         
         if(!multi.transfer(token,msg.sender,value)) throw;
         
