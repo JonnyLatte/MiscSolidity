@@ -1,16 +1,17 @@
-
 // ERC20 Tip bot contract.
 //
 // c) Jonnylatte, MIT licence
 //
 
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.12;
 
 import "github.com/JonnyLatte/MiscSolidity/erc20.sol"; 
 import "github.com/JonnyLatte/MiscSolidity/verySig.sol"; 
 import "github.com/JonnyLatte/MiscSolidity/owned.sol"; 
 
-contract tipBot is owned, verySig {
+contract tipBot is owned {
+    
+    using verySig for bytes32;
     
     mapping(bytes32 => address) public user_accounts;
     mapping(bytes32 => bool) used_tip_hash;
@@ -27,14 +28,14 @@ contract tipBot is owned, verySig {
     function registerAccount(address userAddress, bytes32 userHash, bytes tipBotSig) 
     {
         var hash = getUserRegistrationHash(userAddress, userHash);
-        if(owner != checkSig(hash,tipBotSig) ) throw;
+        if(owner != hash.checkSig(tipBotSig) ) throw;
         
         user_accounts[userHash] = userAddress;
     }
     
     function getTipHash(address tipper,  bytes32 receiver, address token, uint256 value, uint256 expiry) constant returns (bytes32) 
     {
-        return sha3(this,tipper,receiver, value, expiry);
+        return sha3(this,tipper,receiver, token, value, expiry);
     }
     
     function claimTip(address tipper, bytes32 receiver, address token, uint256 value, uint256 expiry, bytes tipperSig) 
@@ -44,7 +45,7 @@ contract tipBot is owned, verySig {
           
           var hash = getTipHash(tipper, receiver,  token,  value,  expiry);  
           
-          if(tipper != checkSig(hash,tipperSig)) throw; // sender must have signed the tip
+          if(tipper != hash.checkSig(tipperSig)) throw; // sender must have signed the tip
           
           if(used_tip_hash[hash]) throw; // the same tip can only be claimed once. Increment expiry to generate new hash 
           used_tip_hash[hash] = true;
