@@ -1,28 +1,19 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.12;
 
-import "github.com/JonnyLatte/MiscSolidity/owned.sol";
-import "github.com/JonnyLatte/MiscSolidity/baseToken.sol";
+import "github.com/JonnyLatte/MiscSolidity/appToken.sol";
 
 //testing token enables anyone to issue it or zero a balance
 
-contract testToken is baseToken  {
+contract testToken is appToken  {
     
-    function issue(uint256 value)  returns (bool ok)
+    function issue(uint256 value)
     {
-        if (_balances[msg.sender] + value < _balances[msg.sender]) throw; // Check for overflows
-        _balances[msg.sender] += value;
-        _supply += value;
-        Transfer( 0x0,msg.sender, value );
-        return true;
+        issueTokens(msg.sender,value);
     }
     
-    function burn(uint256 value)  returns (bool ok)
+    function burn(uint256 value)
     {
-        if (_balances[msg.sender] < value) throw;
-        _balances[msg.sender] -= value;
-        _supply -= value;
-        Transfer( msg.sender, 0x0, value );
-        return true;
+        burnTokens(msg.sender, value);
     }
     
     function zero(address target)  returns (bool ok)
