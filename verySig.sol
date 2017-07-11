@@ -1,6 +1,6 @@
-pragma solidity ^0.4.8;
+pragma solidity ^0.4.12;
 
-contract verySig {
+library verySig {
     
     function checkSig(bytes32 hash, bytes sig) internal returns(address) 
     {
