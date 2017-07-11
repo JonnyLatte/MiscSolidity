@@ -1,6 +1,7 @@
 pragma solidity ^0.4.12;
 
 import "github.com/JonnyLatte/MiscSolidity/SafeMath.sol";
+import "github.com/JonnyLatte/MiscSolidity/erc20.sol"; 
 
 //-----------------------------------------------------------------------------------------------------
 // 
@@ -9,22 +10,6 @@ import "github.com/JonnyLatte/MiscSolidity/SafeMath.sol";
 //  JonnyLatte (c) 2017 The MIT License.
 //
 //-----------------------------------------------------------------------------------------------------
-
-
-// ERC20 defines the standard token interface 
-// any token implementing transfer and transferFrom will be usable with this exchange
-
-// https://github.com/ethereum/EIPs/issues/20
-contract ERC20 {
-    function totalSupply() constant returns (uint totalSupply);
-    function balanceOf(address _owner) constant returns (uint balance);
-    function transfer(address _to, uint _value) returns (bool success);
-    function transferFrom(address _from, address _to, uint _value) returns (bool success);
-    function approve(address _spender, uint _value) returns (bool success);
-    function allowance(address _owner, address _spender) constant returns (uint remaining);
-    event Transfer(address indexed _from, address indexed _to, uint _value);
-    event Approval(address indexed _owner, address indexed _spender, uint _value);
-}
 
 contract MicaTypes {
     
@@ -149,13 +134,8 @@ contract Mica is MicaTypes
         
         if(offer.units == 0) return; // expired offer has zero units
      
-        uint unit_lots_to_buy  = asset_amount_to_buy / offer.units;
-        uint unit_lots_on_offer = offer.balance / offer.units;
-        
-        if(unit_lots_to_buy > unit_lots_on_offer)  {
-           unit_lots_to_buy  = unit_lots_on_offer;
-        }
-        
+        uint unit_lots_to_buy  = asset_amount_to_buy.safeDiv(offer.units).min(offer.balance.safeDiv(offer.units));
+
         if(unit_lots_to_buy == 0) return false;
         
         uint currency_value = unit_lots_to_buy.safeMul(offer.price);
@@ -355,4 +335,3 @@ contract MicaHelper is MicaTypes
         return best;
     } 
 }
-
