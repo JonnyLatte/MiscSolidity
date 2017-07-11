@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.12;
 
 import "github.com/JonnyLatte/MiscSolidity/multiToken.sol";
 import "github.com/JonnyLatte/MiscSolidity/verySig.sol";
