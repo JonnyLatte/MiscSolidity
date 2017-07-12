@@ -102,7 +102,7 @@ contract optionFactory
         if(option.owner != msg.sender) throw;
         
         if(!option.sell_token.transferFrom(msg.sender,this,unitLots.safeMul(option.sell_units))) throw;
-        option.token.issue(unitLots,msg.sender);
+        option.token.mint(msg.sender,unitLots);
         
         mintEvent(id,unitLots);
     }
@@ -113,7 +113,7 @@ contract optionFactory
         
         if(option.owner != msg.sender) throw;
         
-        if(!option.token.burn(unitLots,msg.sender)) throw;
+        if(!option.token.burn(msg.sender,unitLots)) throw;
         if(!option.sell_token.transfer(msg.sender,unitLots.safeMul(option.sell_units))) throw;
         
         burnEvent(id,unitLots);
@@ -125,7 +125,7 @@ contract optionFactory
         
         if(option.expiry > now) throw;
         
-        if(!option.token.burn(unitLots,msg.sender)) throw;
+        if(!option.token.burn(msg.sender,unitLots)) throw;
         if(!option.buy_token.transferFrom (msg.sender,option.owner,unitLots.safeMul(option.buy_units))) throw;
         if(!option.sell_token.transfer(msg.sender  ,unitLots.safeMul(option.sell_units))) throw;
         
