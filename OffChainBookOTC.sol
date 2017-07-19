@@ -24,8 +24,7 @@ contract otc {
     
     mapping(address => mapping(bytes32 => uint)) public approvals;
     mapping(address => mapping(uint => bool)) public usedNonce;
-    
-    event announcePriceLevel(bytes32 hash,ERC20 indexed sellToken, uint sellUnits, ERC20 indexed buyToken, uint buyUnits);
+   
     event onTrade(bytes32 priceHash, uint unitLots);
     
     function getPriceHash(ERC20 sellToken, uint sellUnits, ERC20 buyToken, uint buyUnits) constant returns (bytes32) {
