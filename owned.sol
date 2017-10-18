@@ -3,16 +3,16 @@ pragma solidity ^0.4.12;
 contract owned {
     address public owner;
 
-    function owned() {
+    function owned() public {
         owner = msg.sender;
     }
 
     modifier onlyOwner {
-        if (msg.sender != owner) throw;
+        require(msg.sender == owner);
         _;
     }
 
-    function transferOwnership(address newOwner) onlyOwner {
+    function transferOwnership(address newOwner) public onlyOwner {
         owner = newOwner;
     }
 }
@@ -22,16 +22,16 @@ contract ownedWithAproval
     address public approvedOwner;
     address public owner;
 
-    function ownedWithAproval() {
+    function ownedWithAproval() public {
         owner = msg.sender;
     }
 
     modifier onlyOwner {
-        if (msg.sender != owner) throw;
+        require(msg.sender == owner);
         _;
     }
 
-    function transferOwnership(address newOwner) 
+    function transferOwnership(address newOwner) public
         onlyOwner 
         returns (bool ok)
     {
@@ -40,12 +40,14 @@ contract ownedWithAproval
         return true;
     }
     
-    function approve(address newPotentialOwner) {
+    function approve(address newPotentialOwner)  public
+    onlyOwner 
+    {
         approvedOwner = newPotentialOwner;
     }
     
-    function claimOwnership() returns (bool ok) {
-        if(msg.sender != approvedOwner) throw;
+    function claimOwnership()  public returns (bool ok) {
+        require(msg.sender == approvedOwner);
         owner = approvedOwner;
         return true;
     }
