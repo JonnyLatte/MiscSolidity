@@ -11,15 +11,15 @@ contract baseToken is ERC20 {
     mapping( address => mapping( address => uint ) ) _approvals;
     uint _supply;
 
-    function totalSupply() constant returns (uint supply) {
+    function totalSupply() public constant returns (uint supply) {
         return _supply;
     }
     
-    function balanceOf( address who ) constant returns (uint value) {
+    function balanceOf( address who ) public constant returns (uint value) {
         return _balances[who];
     }
     
-    function transfer( address to, uint value) returns (bool ok) 
+    function transfer( address to, uint value) public returns (bool ok) 
     {
         _balances[msg.sender] = _balances[msg.sender].safeSub(value); // will throw if insufficient funds
         _balances[to]         = _balances[to].safeAdd(value);         // will throw if overflow
@@ -28,7 +28,7 @@ contract baseToken is ERC20 {
         return true;
     }
     
-    function transferFrom( address from, address to, uint value) returns (bool ok) 
+    function transferFrom( address from, address to, uint value) public returns (bool ok) 
     {
         _approvals[from][msg.sender] = _approvals[from][msg.sender].safeSub(value); // will throw if insufficient approval
         _balances[from]              = _balances[from].safeSub(value);              // will throw if insufficient funds
@@ -38,14 +38,14 @@ contract baseToken is ERC20 {
         return true;
     }
     
-    function approve(address spender, uint value) returns (bool ok) {
+    function approve(address spender, uint value) public returns (bool ok) {
         _approvals[msg.sender][spender] = value;
         Approval( msg.sender, spender, value );
         
         return true;
     }
     
-    function allowance(address owner, address spender) constant returns (uint _allowance) {
+    function allowance(address owner, address spender) public constant returns (uint _allowance) {
         return _approvals[owner][spender];
     }
 }
