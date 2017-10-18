@@ -19,7 +19,7 @@ contract baseToken is ERC20 {
         return _balances[who];
     }
     
-    function transfer( address to, uint value) public returns (bool ok) 
+    function transfer( address to, uint value) public returns (bool success) 
     {
         _balances[msg.sender] = _balances[msg.sender].safeSub(value); // will throw if insufficient funds
         _balances[to]         = _balances[to].safeAdd(value);         // will throw if overflow
@@ -28,7 +28,7 @@ contract baseToken is ERC20 {
         return true;
     }
     
-    function transferFrom( address from, address to, uint value) public returns (bool ok) 
+    function transferFrom( address from, address to, uint value) public returns (bool success) 
     {
         _approvals[from][msg.sender] = _approvals[from][msg.sender].safeSub(value); // will throw if insufficient approval
         _balances[from]              = _balances[from].safeSub(value);              // will throw if insufficient funds
@@ -38,7 +38,7 @@ contract baseToken is ERC20 {
         return true;
     }
     
-    function approve(address spender, uint value) public returns (bool ok) {
+    function approve(address spender, uint value) public returns (bool success) {
         _approvals[msg.sender][spender] = value;
         Approval( msg.sender, spender, value );
         
