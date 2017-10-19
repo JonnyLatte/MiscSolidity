@@ -3,13 +3,15 @@ pragma solidity ^0.4.12;
 import "github.com/JonnyLatte/MiscSolidity/multiToken.sol";
 import "github.com/JonnyLatte/MiscSolidity/verySig.sol";
 
-contract stFundManager is fundManager, verySig {
+contract stFundManager is fundManager {
     
-    function signedTransfer(address token, address from, address to, uint256 value, uint256 expires, bytes sig) returns (bool ok)
+    using verySig for bytes32;
+    
+    function signedTransfer(address token, address from, address to, uint256 value, uint256 expires, bytes sig) public returns (bool ok)
     {
-        if(now > expires) throw;
-        if(from != msg.sender) throw;
-        if(checkSig(sha3(token, from, to, value, expires), sig) != from) throw;
+        require(block.timestamp <= expires);
+        require(from == msg.sender);
+        require(keccak256(token, from, to, value, expires).checkSig(sig) == from);
         
         appTransfer(token,from,to,value); 
         
