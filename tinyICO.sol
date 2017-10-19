@@ -19,9 +19,9 @@ contract tinyICO is owned {
         uint epochStartTime,
         uint durationInMinutes,
         uint256 capOnCrowdsale,
-        uint _decimalModifier) 
+        uint _decimalModifier) public
     {
-        assert(_decimalModifier != 0)
+        assert(_decimalModifier != 0);
         saleToken = new ownedToken();
         startTime = epochStartTime;
         deadline  = epochStartTime + (durationInMinutes * 1 minutes);
@@ -29,19 +29,19 @@ contract tinyICO is owned {
         crowdsaleCap = capOnCrowdsale * 1 ether;
     }
 
-    function() payable {
+    function() public payable {
 
         assert(fundsRaised.safeAdd(msg.value) < crowdsaleCap);
-        assert(now > startTime);
-        assert(now < deadline);
+        assert(block.timestamp > startTime);
+        assert(block.timestamp < deadline);
 
         fundsRaised += msg.value;
 
         assert(saleToken.mint(msg.sender,msg.value.safeMul(decimalModifier)));
     }
 
-    function widthraw() onlyOwner {
-        assert(now > deadline);
+    function widthraw() public onlyOwner {
+        assert(block.timestamp > deadline);
         owner.transfer(this.balance);
     }
 
