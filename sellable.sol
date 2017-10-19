@@ -1,21 +1,6 @@
-pragma solidity ^0.4.8;
+pragma solidity ^0.4.12;
 
-contract owned {
-    address public owner;
-
-    function owned() {
-        owner = msg.sender;
-    }
-
-    modifier onlyOwner {
-        if (msg.sender != owner) throw;
-        _;
-    }
-
-    function transferOwnership(address newOwner) onlyOwner {
-        owner = newOwner;
-    }
-}
+import "github.com/JonnyLatte/MiscSolidity/owned.sol";
 
 contract sellable is owned {
     
@@ -28,11 +13,11 @@ contract sellable is owned {
     event onTrade();
     event onExecute(address _to, uint _value, bytes _data);
     
-    function sellable() {
+    function sellable() public {
         selling = false;
     }
     
-    function initSale(uint _price) onlyOwner 
+    function initSale(uint _price) public onlyOwner 
     {
         nonce++;
         price = _price;
@@ -41,23 +26,23 @@ contract sellable is owned {
         onSale(price);
     }
     
-    function cancelSale() onlyOwner {
+    function cancelSale() public  onlyOwner {
         selling = false;
         onCancelSale();
     }
     
-    function takerBuys(uint _nonce) payable 
+    function takerBuys(uint _nonce) public payable 
     {
         if(_nonce != nonce || !selling) return; // contract no longer selling
-        if(msg.value != price) throw;
+        require(msg.value == price);
         selling = false; // prevent sale after ownership transfer
         address seller = owner; // store seller address so that contract state can be updated before external call
         owner = msg.sender; // update owner
-        if(!seller.send(msg.value)) throw; // pay seller
+        seller.transfer(msg.value); // pay seller
         onTrade();
     }
     
-    function execute(address _to, uint _value, bytes _data) onlyOwner returns (bool) 
+    function execute(address _to, uint _value, bytes _data) public onlyOwner returns (bool) 
     {
         if(selling) cancelSale(); // interacting with contract during sale period canceles sale
         onExecute(
