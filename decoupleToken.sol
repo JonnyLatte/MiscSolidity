@@ -6,7 +6,9 @@ import "github.com/JonnyLatte/MiscSolidity/verySig.sol";
 // base token that allows anyone to submit a transaction on behalf of an addres in return for a fee
 // TODO: decoupled approval and transferFrom
 
-contract decoupleToken is baseToken , verySig {
+contract decoupleToken is baseToken {
+    
+    using verySig for bytes32;
     
     mapping(address => mapping(uint => bool)) public usedNonce;
     
@@ -16,14 +18,14 @@ contract decoupleToken is baseToken , verySig {
         _balances[to]    = _balances[to].safeAdd(value);                // will throw if overflow
     }
     
-    function getTranferHash(address from, address to, uint value, uint fee, uint nonce) constant returns(bytes32) {
-        return sha3(this,from,to,value,fee,nonce);
+    function getTranferHash(address from, address to, uint value, uint fee, uint nonce) public constant returns(bytes32) {
+        return keccak256(this,from,to,value,fee,nonce);
     }
     
-    function decoupledTransfer(address from, address to, uint value, uint fee, uint nonce, bytes sig) {
+    function decoupledTransfer(address from, address to, uint value, uint fee, uint nonce, bytes sig) public {
         
         var hash = getTranferHash(from, to, value, fee, nonce);
-        if(from != checkSig(hash, sig)) throw;
+        require(from == hash.checkSig(sig));
         
         if(usedNonce[from][nonce] == false)
         {
