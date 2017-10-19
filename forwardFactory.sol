@@ -1,4 +1,4 @@
-pragma solidity ^0.4.10;
+pragma solidity ^0.4.12;
 
 /*
 
@@ -38,14 +38,14 @@ contract forwardFactory {
     function deployCode(bytes _code) internal returns (address deployedAddress)  {
         assembly {
           deployedAddress := create(0, add(_code, 0x20), mload(_code))
-          jumpi(invalidJumpLabel, iszero(extcodesize(deployedAddress))) // jumps if no code at addresses
+          switch extcodesize(deployedAddress) case 0 { invalid() }
         }
         _code;
         codeDeployed(deployedAddress);
     } 
   
 
-    function deployForwarder(address addr) returns(address) {
+    function deployForwarder(address addr) public returns(address) {
        
        for (uint i = 0; i < 20; i++) {
             fwdrCode[46-i] = byte(uint8(uint(addr) >> (8*i)));
@@ -64,20 +64,20 @@ contract fixedForwardFactory {
     function deployCode(bytes _code) internal returns (address deployedAddress)  {
         assembly {
           deployedAddress := create(0, add(_code, 0x20), mload(_code))
-          jumpi(invalidJumpLabel, iszero(extcodesize(deployedAddress))) // jumps if no code at addresses
+          switch extcodesize(deployedAddress) case 0 { invalid() }
         }
         _code;
         codeDeployed(deployedAddress);
     } 
   
 
-    function fixedForwardFactory(address addr)  {
+    function fixedForwardFactory(address addr) public {
        for (uint i = 0; i < 20; i++) {
             fwdrCode[46-i] = byte(uint8(uint(addr) >> (8*i)));
        }
     }
     
-    function deployForwarder() returns(address) {
+    function deployForwarder() public returns(address)  {
        return deployCode(fwdrCode);   
     }
     
