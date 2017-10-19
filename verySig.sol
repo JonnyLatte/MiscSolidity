@@ -2,7 +2,7 @@ pragma solidity ^0.4.12;
 
 library verySig {
     
-    function checkSig(bytes32 hash, bytes sig) internal returns(address) 
+    function checkSig(bytes32 hash, bytes sig) internal pure returns(address) 
     {
         //https://gitter.im/ethereum/solidity/archives/2016/12/14
         
