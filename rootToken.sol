@@ -1,70 +1,49 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.12;
 
 import "github.com/JonnyLatte/MiscSolidity/appToken.sol";
 
-// rootToken is initialized with a root hash which is added to a mapping validHash
-// any hash in validHash is either a claim or a node
-// a node is a sha3 hash of 2 hashes that can be added to the validHash mapping using addNode()
-// a claim is a sha3 hash of an address and uint256 balance
-// calling processClaim() issues tokens to 
-//
-// Jonnylatte, MIT licence
+contract rootBase  {
 
-contract rootBase 
-{
-    bytes32 public rootHash;
-    mapping(bytes32 => bool) public validHash;
-    mapping(bytes32 => bool) public claimedHash;
-    
-    function initRoot(bytes32 _rootHash) internal {
-        rootHash = _rootHash;
-        validHash[_rootHash] = true;  
-    }
-    
-    function hashNode(bytes32 left, bytes32 right) constant returns (bytes32) 
-    {
-        return sha3(left,right);
-    }  
-    
-    function validNode(bytes32 left, bytes32 right) constant returns (bool ok)
-    {
-        return validHash[hashNode(left,right)];
-    }
-    
-    function addNode(bytes32 left, bytes32 right) returns (bool ok)
-    {
-        if(!validNode(left,right)) throw;
+    bytes32 public roothash;
+    mapping(bytes32 => bool) used;
 
-        validHash[left] = true;
-        validHash[right] = true;
-        return true;
+    function prove(bytes32[] hashes, bool[] parity, bytes32 subject) constant public returns(bool valid)  {
+        bytes32 h = subject; 
+        for(uint i = 0; i < hashes.length; i++) {
+            if(parity[i]) h = keccak256(h        ,hashes[i]);
+            else          h = keccak256(hashes[i],h        );
+        }
+        return (h == roothash && used[subject] == false);
     }
 }
 
 contract rootToken is rootBase, appToken 
 {
-    function rootToken(bytes32 _rootHash) 
+    function rootToken(bytes32 _roothash) public 
     {
-        initRoot(_rootHash);
+        roothash = _roothash;
     }
 
-    function hashClaim(address target, uint256 value) constant returns (bytes32) 
+    function processClaim(bytes32[] hashes, bool[] parity, address target, uint256 value) public returns (bool ok)
     {
-        return sha3(target,value);
-    }   
-    
-    function validClaim(address target, uint256 value) constant returns (bool ok)
-    {
-        return validHash[hashClaim(target, value)];
+        var subject = keccak256(target, value);
+        
+        if(prove(hashes,parity,subject)) {
+            used[subject] = true;
+            issueTokens(target, value);
+            return true;
+        }
     }
     
-    function processClaim(address target, uint256 value)  returns (bool ok)
+   
+    function checkProcessClaim(bytes32[] hashes, bool[] parity, address target, uint256 value) public constant returns (bool ok)
     {
-        var hash = hashClaim(target, value);
-        if(validHash[hash] == false) throw;
-        if(claimedHash[hash] == true) throw;
-        claimedHash[hash] = true;
-        issueTokens(target, value);
-        return true;
+        var subject = keccak256(target, value);
+        
+        if(prove(hashes,parity,subject)) {
+           // used[subject] = true;
+            //issueTokens(target, value);
+            return true;
+        }
     }
 }
