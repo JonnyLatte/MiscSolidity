@@ -1,5 +1,9 @@
 pragma solidity ^0.4.12;
 
+// Tool to generate the root hash of 100K records and display the proof for 2 of them:
+// https://gist.github.com/JonnyLatte/5d72bec5bc708a0be61b3d3b15eadbb3
+
+
 import "github.com/JonnyLatte/MiscSolidity/appToken.sol";
 
 contract rootBase  {
