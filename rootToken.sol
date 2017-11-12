@@ -2,11 +2,29 @@ pragma solidity ^0.4.12;
 
 import "github.com/JonnyLatte/MiscSolidity/appToken.sol";
 
+library rootLib {
+    
+    function getRoot(bytes32 leaf,bytes32[] proof) constant public returns(bytes32 root)  {
+        bytes32 h = leaf; 
+        for(uint i = 0; i < proof.length; i++) {
+            if(h > proof[i]) h = keccak256(h        ,proof[i]);
+            else             h = keccak256(proof[i],h        );
+        }
+        return h;
+    }
+    
+    function prove(bytes32 leaf,bytes32[] proof, bytes32 root) constant public returns (bool valid)  {
+        return (root == getRoot(leaf,proof));
+    }
+    
+}
+
 contract rootBase  {
+    
+    using rootLib for bytes32;
 
     mapping(bytes32 => bool) public roothashes;
-    mapping(bytes32 => bool) public used;
-    
+   
     event onRootHash(bytes32 hash, bool valid);
     
     function setRoot(bytes32 hash, bool valid) internal {
@@ -14,42 +32,37 @@ contract rootBase  {
         onRootHash(hash,valid);
     }
 
-    function prove(bytes32[] hashes, bytes32 subject) constant public returns(bool valid)  {
-        bytes32 h = subject; 
-        for(uint i = 0; i < hashes.length; i++) {
-            if(h > hashes[i]) h = keccak256(h        ,hashes[i]);
-            else              h = keccak256(hashes[i],h        );
-        }
-        return (roothashes[h] && used[subject] == false);
+    function prove(bytes32[] proof, bytes32 leaf) constant public returns(bool valid)  {
+        return roothashes[leaf.getRoot(proof)];
     }
 }
 
 contract rootToken is rootBase, appToken 
-{
+{ 
+    mapping(bytes32 => bool) public used;
+    
     function rootToken(bytes32 _roothash) public 
     {
         setRoot(_roothash,true);
     }
 
-    function processClaim(bytes32[] hashes, address target, uint256 value) public returns (bool ok)
+    function processClaim(bytes32[] proof, address target, uint256 value) public returns (bool ok)
     {
-        var subject = keccak256(target, value);
+        var leaf = keccak256(target, value);
         
-        if(prove(hashes,subject)) {
-            used[subject] = true;
+        if(used[leaf] == false && prove(proof,leaf)) {
+            used[leaf] = true;
             issueTokens(target, value);
             return true;
         }
     }
     
    
-    function checkProcessClaim(bytes32[] hashes, address target, uint256 value) public constant returns (bool ok)
+    function checkProcessClaim(bytes32[] proof, address target, uint256 value) public constant returns (bool ok)
     {
-        var subject = keccak256(target, value);
+        var leaf = keccak256(target, value);
         
-        if(prove(hashes,subject)) {
-           // used[subject] = true;
-            //issueTokens(target, value);
+        if(prove(proof,leaf)) {
             return true;
         }
     }
