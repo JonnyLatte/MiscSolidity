@@ -2,6 +2,9 @@ pragma solidity ^0.4.12;
 
 import "github.com/JonnyLatte/MiscSolidity/appToken.sol";
 
+//test records:
+//https://gist.github.com/JonnyLatte/b2d4e6bac195f54a7270e9e7f11f69c6#file-roottoken-html
+
 library rootLib {
     
     function getRoot(bytes32 leaf,bytes32[] proof) constant public returns(bytes32 root)  {
