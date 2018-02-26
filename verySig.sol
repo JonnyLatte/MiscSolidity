@@ -1,7 +1,7 @@
 pragma solidity ^0.4.12;
 
 
-library hashTools {
+library verySig {
   
     // reverse the bytes of a byte32 value
     function reverseBytes32(bytes32 x) internal pure returns (bytes32) {
