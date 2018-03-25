@@ -75,16 +75,16 @@ contract tokenWrapper is owned, baseToken {
     }
     
     function getDepositAddress(address user) public constant returns (address) {
-        return TokenWrapperFactory(owner).depositContracts(user);
+        return tokenWrapperFactory(owner).depositContracts(user);
     }
     
     function initDepositAddress(address user) public returns (address) {
-        return TokenWrapperFactory(owner).initDepositContract(user);
+        return tokenWrapperFactory(owner).initDepositContract(user);
     }
     
     function processDeposit(uint amount) public returns (bool ok) {
         
-        require(TokenWrapperFactory(owner).wrapperCallsProcessDeposit(token,msg.sender,amount));
+        require(tokenWrapperFactory(owner).wrapperCallsProcessDeposit(token,msg.sender,amount));
         
         _balances[msg.sender] = _balances[msg.sender].safeAdd(amount);
         _supply = _supply.safeAdd(amount);
@@ -100,7 +100,7 @@ contract tokenWrapper is owned, baseToken {
         _balances[msg.sender] = _balances[msg.sender].safeSub(amount);
         _supply = _supply.safeSub(amount);
         
-        require(TokenWrapperFactory(owner).wrapperCallsProcessWithdraw(token,msg.sender,amount));
+        require(tokenWrapperFactory(owner).wrapperCallsProcessWithdraw(token,msg.sender,amount));
         
         return true; 
     }   
