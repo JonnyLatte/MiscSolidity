@@ -8,9 +8,22 @@ const web3 = require('web3')
 // outputs a file containing the root hash and merkle proofs compatible with rootToken contract:
 // https://github.com/JonnyLatte/MiscSolidity/blob/master/rootToken.sol
 
+
 let filename = "addresses.txt"; // file to parse comma seperated items each line
-let addressIndex = 1; // index of the ethereum address item in  a line
-let balanceIndex = 2; // index of the balance item
+let addressIndex = 0; // index of the ethereum address item in  a line
+let balanceIndex = 1; // index of the balance item
+
+if(process.argv.length == 4) {
+    addressIndex = process.argv[2];
+    balanceIndex = process.argv[3];
+} else if(process.argv.length == 5) {
+    addressIndex = process.argv[2];
+    balanceIndex = process.argv[3];
+    filename = process.argv[4];
+} else {
+    console.log("Usage: 'address_index' 'balance_index' ['file_name']");
+    process.exit();
+}
 
 // hash address
 //console.log(web3.utils.soliditySha3({t: 'address', v: '0xe853c56864a2ebe4576a807d26fdc4a0ada51919'}))
